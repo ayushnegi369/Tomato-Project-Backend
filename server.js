@@ -29,9 +29,20 @@ const defaultOrigins = [
 const allowedOrigins = process.env.FRONTEND_ORIGIN
   ? process.env.FRONTEND_ORIGIN.split(",").map((s) => s.trim())
   : defaultOrigins; // default for local dev and deployed Vercel URL
+
+// Allow common preview deploy subdomains on Vercel (pattern-based)
+const allowedOriginPatterns = [
+  /^https?:\/\/localhost:(5173|5174)$/,
+  /^https:\/\/tomato-frontend-[a-z0-9-]+-ayushnegi369s-projects\.vercel\.app$/i,
+];
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true); // non-browser or same-origin
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      if (allowedOriginPatterns.some((re) => re.test(origin))) return callback(null, true);
+      return callback(new Error("Not allowed by CORS"));
+    },
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "token"],
     credentials: false,
