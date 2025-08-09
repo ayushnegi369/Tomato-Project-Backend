@@ -21,9 +21,14 @@ const port = process.env.PORT || 4000; // Support dynamic port for hosting platf
 // Middleware configuration
 app.use(express.json()); // Middleware to parse incoming JSON requests
 // Configure CORS for separate frontend/backend hosting
+const defaultOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "https://tomato-frontend-git-main-ayushnegi369s-projects.vercel.app",
+];
 const allowedOrigins = process.env.FRONTEND_ORIGIN
   ? process.env.FRONTEND_ORIGIN.split(",").map((s) => s.trim())
-  : ["http://localhost:5173"]; // default for local dev (Vite)
+  : defaultOrigins; // default for local dev and deployed Vercel URL
 app.use(
   cors({
     origin: allowedOrigins,
